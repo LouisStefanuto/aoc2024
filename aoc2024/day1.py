@@ -18,7 +18,7 @@ def open_txt_file(file_path: Path) -> list[str]:
     return lines
 
 
-def slice_data(lines: list[str]) -> list[int]:
+def slice_data(lines: list[str]) -> list[list[int]]:
     data = []
     for line in lines:
         data_line = list(map(int, line.split()))
@@ -26,7 +26,7 @@ def slice_data(lines: list[str]) -> list[int]:
     return data
 
 
-def preprocess_data(lines: list[int, int]) -> tuple[list, list]:
+def preprocess_data(lines: list[list[int]]) -> tuple[list[int], list[int]]:
     list1, list2 = [], []
     for x, y in lines:
         list1.append(x)
@@ -35,7 +35,7 @@ def preprocess_data(lines: list[int, int]) -> tuple[list, list]:
 
 
 def occurences(a: list[int]) -> dict[int, int]:
-    counts = dict()
+    counts: dict[int, int] = dict()
     for x in a:
         counts[x] = counts.get(x, 0) + 1
     return counts
