@@ -7,6 +7,7 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = "^3.13"
+numpy = "^2.1.3"
 
 
 [tool.poetry.group.dev.dependencies]
@@ -15,6 +16,7 @@ pre-commit = "^4.0.1"
 ruff = "^0.8.1"
 mypy = "^1.13.0"
 bandit = "^1.8.0"
+pytest-cov = "^6.0.0"
 
 [build-system]
 requires = ["poetry-core"]
@@ -25,3 +27,6 @@ extend-include = ["*.ipynb"]  # lint and format jupyer notebooks
 
 [tool.ruff.lint]
 extend-select = ["I"]  # sort imports like isort https://github.com/astral-sh/ruff/issues/8926
+
+[tool.pytest.ini_options]
+addopts = "--cov=aoc2024"
