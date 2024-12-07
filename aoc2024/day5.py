@@ -41,16 +41,13 @@ def is_valid_update(update: list[int], order_dict: dict[int, list[int]]) -> bool
     return True
 
 
-def get_valid_updates(
+def get_updates_status(
     updates: list[list[int]], order_dict: dict[int, list[int]]
-) -> list[list[int]]:
-    valid_updates = []
-
-    for update in updates:
-        if is_valid_update(update, order_dict):
-            valid_updates.append(update)
-
-    return valid_updates
+) -> tuple[list[int], list[int]]:
+    bool_list = [is_valid_update(update, order_dict) for update in updates]
+    true_indices = [i for i, val in enumerate(bool_list) if val]
+    false_indices = [i for i, val in enumerate(bool_list) if not val]
+    return true_indices, false_indices
 
 
 def get_middle_page(update: list[int]) -> int:
@@ -69,9 +66,15 @@ if __name__ == "__main__":
     data = read_file_to_list(Path("inputs/day5.txt"))
     orders, updates_str = split_orders_updates(data)
     updates = [split_update(update) for update in updates_str]
-
     order_dict = build_order_dict(orders)
-    valid_updates = get_valid_updates(updates, order_dict)
-    result = sum_middle_pages(valid_updates)
 
-    print(result)
+    true_indices, false_indices = get_updates_status(updates, order_dict)
+    valid_updates = [updates[i] for i in true_indices]
+    false_updates = [updates[i] for i in false_indices]
+
+    result1 = sum_middle_pages(valid_updates)
+    print("Part1:", result1)
+
+    result2 = 0
+    print(order_dict)
+    print("Part2:", result2)
