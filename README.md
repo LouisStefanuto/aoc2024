@@ -1,7 +1,7 @@
 # Advent of Code 2024
 
 ![Python Version](https://img.shields.io/badge/python-3.13-blue)
-[![Coverage](https://codecov.io/gh/<user>/<repo>/branch/main/graph/badge.svg)](https://codecov.io/gh/<user>/<repo>)
+[![Coverage](https://codecov.io/gh/LouisStefanuto/aoc2024/branch/main/graph/badge.svg)](https://codecov.io/gh/LouisStefanuto/aoc2024)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
 My submissions to the Advent of Code 2024: **https://adventofcode.com/2024**.
