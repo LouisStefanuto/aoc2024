@@ -31,7 +31,15 @@ jobs:
     - name: 🏗️ Install dependencies using Poetry
       run: poetry install --with dev
 
-    - name: 🤖 Run tests
+    - name: 🤖 Run tests and generate coverage report
       run: |
         source .venv/bin/activate
-        pytest
+        pytest --cov=aoc2024 --cov-report=xml
+
+    - name: 📤 Upload coverage to Codecov
+      uses: codecov/codecov-action@v5
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        files: ./coverage.xml
+        flags: unittests
+        name: codecov-umbrella
