@@ -1,6 +1,15 @@
+"""
+TODO
+Would be better to use classes for the updates and for the OrderDict
+"""
+
+import logging
 from pathlib import Path
 
 from aoc2024.day4 import read_file_to_list
+
+Update = list[int]
+OrderDict = dict[int, list[int]]
 
 
 def split_orders_updates(lines: list[str]) -> tuple[list[str], list[str]]:
@@ -19,15 +28,15 @@ def split_update(update: str) -> list[int]:
     return list(int(x) for x in update.split(","))
 
 
-def build_order_dict(orders: list[str]) -> dict[int, list[int]]:
-    order_dict: dict[int, list[int]] = {}
+def build_order_dict(orders: list[str]) -> OrderDict:
+    order_dict: OrderDict = {}
     for order in orders:
         a, b = split_order(order)
         order_dict[a] = order_dict.get(a, []) + [b]
     return order_dict
 
 
-def is_valid_update(update: list[int], order_dict: dict[int, list[int]]) -> bool:
+def is_valid_update(update: Update, order_dict: OrderDict) -> bool:
     pages_seen: set[int] = set()
 
     for page in update:
@@ -42,7 +51,7 @@ def is_valid_update(update: list[int], order_dict: dict[int, list[int]]) -> bool
 
 
 def get_updates_status(
-    updates: list[list[int]], order_dict: dict[int, list[int]]
+    updates: list[Update], order_dict: OrderDict
 ) -> tuple[list[int], list[int]]:
     bool_list = [is_valid_update(update, order_dict) for update in updates]
     true_indices = [i for i, val in enumerate(bool_list) if val]
@@ -50,16 +59,43 @@ def get_updates_status(
     return true_indices, false_indices
 
 
-def get_middle_page(update: list[int]) -> int:
+def get_middle_page(update: Update) -> int:
     return update[len(update) // 2]
 
 
-def sum_middle_pages(valid_updates: list[list[int]]) -> int:
+def sum_middle_pages(valid_updates: list[Update]) -> int:
     counter = 0
     for update in valid_updates:
         counter += get_middle_page(update)
 
     return counter
+
+
+def move_up_first_error(update: Update, order_dict: OrderDict) -> Update:
+    pages_seen: set[int] = set()
+
+    for i, page in enumerate(update):
+        pages_after = set(order_dict.get(page, []))
+
+        for page_seen in pages_seen:
+            if page_seen in pages_after:
+                # Swap page with the one before
+                update[i], update[i - 1] = update[i - 1], update[i]
+                return update
+        pages_seen.add(page)
+
+    logging.warning("No error found in this update.")
+    return update
+
+
+def order_update(update: Update, order_dict: OrderDict) -> Update:
+    while not is_valid_update(update, order_dict):
+        update = move_up_first_error(update, order_dict)
+    return update
+
+
+def fix_false_updates(updates: list[Update], order_dict: OrderDict) -> list[Update]:
+    return [order_update(false_update, order_dict) for false_update in updates]
 
 
 if __name__ == "__main__":
@@ -76,5 +112,6 @@ if __name__ == "__main__":
     print("Part1:", result1)
 
     result2 = 0
-    print(order_dict)
+    fixed_updates = fix_false_updates(false_updates, order_dict)
+    result2 = sum_middle_pages(fixed_updates)
     print("Part2:", result2)
