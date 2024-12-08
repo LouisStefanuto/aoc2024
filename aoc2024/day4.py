@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 
 
-def read_file_to_list(file_path: Path):
+def read_file_to_list(file_path: Path) -> list[str]:
     """
     Reads a text file and stores its content in a list.
 
@@ -28,7 +28,7 @@ def collate_letters(letters: list[str]) -> str:
     return "".join(letters)
 
 
-def convert_to_matrix(data: list[str]) -> np.array:
+def convert_to_matrix(data: list[str]) -> np.ndarray:
     return np.array([list(string) for string in data])
 
 
