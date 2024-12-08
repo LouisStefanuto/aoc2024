@@ -54,8 +54,10 @@ class Terrain:
         self.guard = self.find_guard()
         # Track visited positions as (x, y, direction)
         self.visited: set[tuple[int, int, GuardDirection]] = set()
-        # Add initial position to visited
-        self.visited.add((self.guard.x, self.guard.y, self.guard.direction))
+
+    def __repr__(self) -> str:
+        grid_str = "\n".join("".join(row) for row in self.grid)
+        return "\n" + grid_str + "\n"
 
     def find_guard(self) -> Guard:
         """
@@ -95,51 +97,97 @@ class Terrain:
             else:
                 raise ValueError(f"Direction is not in {GuardDirection}")
 
-            # If next is out, return terminal is True
             if self.is_position_out(next_x, next_y):
+                # Next is out, return terminal is True
                 return Guard(next_x, next_y, direction), True
 
             # The next position is in the grid.
-            next_is_obstacle = self.grid[next_x, next_y] == "#"
+            next_is_obstacle = self.grid[next_x, next_y] in ["#", "O"]
 
             if next_is_obstacle:
                 # Case obstacle: Turn guard to the right and retry
-                direction = DIR_CLOCKWISE[self.guard.direction]
+                direction = DIR_CLOCKWISE[direction]
 
         # If next is found, return terminal is False
         return Guard(next_x, next_y, direction), False
 
-    def move_guard(self) -> bool:
+    def move_guard(self) -> tuple[bool, bool]:
         """
-        Move the guard to the next valid position. Returns True if terminal, False otherwise.
+        Move the guard to the next valid position. Return a pair of booleans:
+        - loop: If the guard has already been in this position/direction in a previously visited state.
+        - terminal: True if state is terminal, False otherwise.
         """
+        if (self.guard.x, self.guard.y, self.guard.direction) in self.visited:
+            return True, False  # Loop, not terminal
+
+        # State never visited before. Add it to visited states
         self.visited.add((self.guard.x, self.guard.y, self.guard.direction))
+        self.grid[self.guard.x, self.guard.y] = "X"
 
         next_guard, terminal = self.get_next_move()
         if terminal:
-            return True  # End movement
+            return False, True  # No loop, terminal
 
-        # Update guard position and add to visited set
+        # Update guard position
         self.guard = next_guard
 
-        return False
+        return False, False  # No loop, not terminal
 
-    def solution1(self):
-        terminal = False
-        while not terminal:
-            terminal = self.move_guard()
+    def solution1(self) -> tuple[int, bool]:
+        loop, terminal = False, False
 
-        unique_pos: set[str] = set()
+        while (not terminal) and (not loop):
+            loop, terminal = self.move_guard()
+
+        unique_pos: set[tuple[int, int]] = set()
         for pos in self.visited:
             unique_pos.add((pos[0], pos[1]))
 
-        return len(unique_pos)
+        return len(unique_pos), loop
+
+    def is_loop(self) -> bool:
+        return self.solution1()[1]
+
+
+def solution2(input_path: Path) -> int:
+    # Initialize
+    data = read_file_to_list(input_path)
+    arr = convert_to_matrix(data)
+    terrain = Terrain(arr)
+    guard = terrain.find_guard()
+
+    N, M = arr.shape
+    result2 = 0
+
+    for i in range(N):
+        for j in range(M):
+            data = read_file_to_list(input_path)
+            arr = convert_to_matrix(data)
+            terrain = Terrain(arr)
+
+            # Ignore the case where the object is in the guard
+            if (i, j) != (guard.x, guard.y):
+                terrain.grid[i, j] = "O"  # obstacle
+                is_loop = terrain.is_loop()
+                result2 += int(is_loop)
+
+                print(f"Tested ({i:03}, {j:03} - {is_loop})")
+                if is_loop:
+                    print(terrain)
+
+    return result2
 
 
 if __name__ == "__main__":
-    data = read_file_to_list(Path("inputs/day6.txt"))
+    input_path = Path("inputs/day6.txt")
+
+    data = read_file_to_list(input_path)
     arr = convert_to_matrix(data)
     terrain = Terrain(arr)
+    print(terrain)
 
-    result1 = terrain.solution1()
+    result1, _ = terrain.solution1()
     print(f"Result1: Unique visited positions: {result1}")
+
+    result2 = solution2(input_path)
+    print(f"Result2: {result2}")

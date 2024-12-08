@@ -3,7 +3,7 @@ from pathlib import Path
 import numpy as np
 
 
-def read_file_to_list(file_path: Path):
+def read_file_to_list(file_path: Path) -> list[str]:
     """
     Reads a text file and stores its content in a list.
 
