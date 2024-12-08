@@ -28,7 +28,7 @@ def collate_letters(letters: list[str]) -> str:
     return "".join(letters)
 
 
-def convert_to_matrix(data: list[str]) -> np.array:
+def convert_to_matrix(data: list[str]) -> np.ndarray:
     return np.array([list(string) for string in data])
 
 
