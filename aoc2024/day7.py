@@ -10,6 +10,7 @@ Operation = list[str]
 class Operator(StrEnum):
     ADD = "+"
     MUL = "*"
+    CONCAT = "||"
 
 
 @dataclass
@@ -28,6 +29,8 @@ class Equation:
                 result += self.numbers[i + 1]
             elif operator == Operator.MUL:
                 result *= self.numbers[i + 1]
+            elif operator == Operator.CONCAT:
+                result = int(str(result) + str(self.numbers[i + 1]))
             else:
                 raise ValueError("Invalid operator encountered when computing result.")
 
@@ -41,8 +44,8 @@ class Equation:
         while len_operation < num_operators:
             tmp_operations = []
             for operation in operations:
-                tmp_operations.append(operation + ["+"])
-                tmp_operations.append(operation + ["*"])
+                for operator in Operator:
+                    tmp_operations.append(operation + [operator])
             operations = tmp_operations
             len_operation += 1
 
@@ -73,5 +76,5 @@ def solution1(equations: list[Equation]) -> int:
 if __name__ == "__main__":
     lines = read_file_to_list(Path("inputs/day7.txt"))
     equations = [split_line(line) for line in lines]
-    result1 = solution1(equations)
-    print(f"Result1: {result1}")
+    result = solution1(equations)
+    print(f"Result: {result}")

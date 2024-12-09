@@ -15,14 +15,9 @@ def test_equation_compute_operation():
 
 
 def test_equation_list_operations():
-    equation = Equation(11111, [111, 222, 333])
-    expected = [
-        ["+", "+"],
-        ["+", "*"],
-        ["*", "+"],
-        ["*", "*"],
-    ]
-
+    equation = Equation(11111, [111, 222])
+    expected = [["+"], ["*"], ["||"]]
+    print(equation.list_operations())
     assert equation.list_operations() == expected
 
 
@@ -31,14 +26,33 @@ def test_equation_list_operations_2():
     expected = [
         ["+", "+", "+"],
         ["+", "+", "*"],
+        ["+", "+", "||"],
         ["+", "*", "+"],
         ["+", "*", "*"],
+        ["+", "*", "||"],
+        ["+", "||", "+"],
+        ["+", "||", "*"],
+        ["+", "||", "||"],
         ["*", "+", "+"],
         ["*", "+", "*"],
+        ["*", "+", "||"],
         ["*", "*", "+"],
         ["*", "*", "*"],
+        ["*", "*", "||"],
+        ["*", "||", "+"],
+        ["*", "||", "*"],
+        ["*", "||", "||"],
+        ["||", "+", "+"],
+        ["||", "+", "*"],
+        ["||", "+", "||"],
+        ["||", "*", "+"],
+        ["||", "*", "*"],
+        ["||", "*", "||"],
+        ["||", "||", "+"],
+        ["||", "||", "*"],
+        ["||", "||", "||"],
     ]
-    print(equation.list_operations())
+
     assert equation.list_operations() == expected
 
 
