@@ -38,44 +38,105 @@ class AntennaMap:
 Position = tuple[int, int]
 
 
-def compute_antinodes(antenna1: Antenna, antenna2: Antenna) -> list[Position]:
-    if antenna1.value != antenna2.value:
-        return []
+class Solution1:
+    def compute_antinodes(self, antenna1: Antenna, antenna2: Antenna) -> list[Position]:
+        if antenna1.value != antenna2.value:
+            return []
 
-    gap_x = antenna2.x - antenna1.x
-    gap_y = antenna2.y - antenna1.y
+        gap_x = antenna2.x - antenna1.x
+        gap_y = antenna2.y - antenna1.y
 
-    return [
-        (antenna1.x - gap_x, antenna1.y - gap_y),
-        (antenna2.x + gap_x, antenna2.y + gap_y),
-    ]
+        return [
+            (antenna1.x - gap_x, antenna1.y - gap_y),
+            (antenna2.x + gap_x, antenna2.y + gap_y),
+        ]
+
+    def compute_all_antinodes(self, antennas: list[Antenna]) -> list[Position]:
+        positions: list[Position] = []
+
+        for i in range(len(antennas) - 1):
+            for j in range(i + 1, len(antennas)):
+                antenna1, antenna2 = antennas[i], antennas[j]
+                if antenna1 != antenna2:
+                    positions += self.compute_antinodes(antenna1, antenna2)
+
+        return positions
+
+    def compute(self, antenna_map: AntennaMap) -> set[Position]:
+        antennas = antenna_map.list_antennas()
+        antinodes = self.compute_all_antinodes(antennas)
+
+        N, M = antenna_map.grid.shape
+        valid_antinodes: list[Position] = []
+        for position in antinodes:
+            x, y = position
+            if 0 <= x and x < N and 0 <= y and y < M:
+                valid_antinodes.append(position)
+
+        # Only keep unique antinodes
+        return set(valid_antinodes)
 
 
-def compute_all_antinodes(antennas: list[Antenna]) -> list[Position]:
-    positions: list[Position] = []
+class Solution2:
+    def compute_antinodes(
+        self, antenna1: Antenna, antenna2: Antenna, map_size: tuple[int, int]
+    ) -> list[Position]:
+        if antenna1.value != antenna2.value:
+            return []
 
-    for i in range(len(antennas) - 1):
-        for j in range(i + 1, len(antennas)):
-            antenna1, antenna2 = antennas[i], antennas[j]
-            if antenna1 != antenna2:
-                positions += compute_antinodes(antenna1, antenna2)
+        gap_x = antenna2.x - antenna1.x
+        gap_y = antenna2.y - antenna1.y
+        N, M = map_size
+        antinodes = []
 
-    return positions
+        # Points behind antenna 1
+        new_antenna_x = antenna1.x
+        new_antenna_y = antenna1.y
 
+        while (
+            0 <= new_antenna_x
+            and new_antenna_x < N
+            and 0 <= new_antenna_y
+            and new_antenna_y < M
+        ):
+            antinodes.append((new_antenna_x, new_antenna_y))
+            new_antenna_x = new_antenna_x - gap_x
+            new_antenna_y = new_antenna_y - gap_y
 
-def solution1(antenna_map: AntennaMap) -> set[Position]:
-    antennas = antenna_map.list_antennas()
-    antinodes = compute_all_antinodes(antennas)
+        # Points behind antenna 2
+        new_antenna_x = antenna2.x
+        new_antenna_y = antenna2.y
 
-    N, M = antenna_map.grid.shape
-    valid_antinodes: list[Position] = []
-    for position in antinodes:
-        x, y = position
-        if 0 <= x and x < N and 0 <= y and y < M:
-            valid_antinodes.append(position)
+        while (
+            0 <= new_antenna_x
+            and new_antenna_x < N
+            and 0 <= new_antenna_y
+            and new_antenna_y < M
+        ):
+            antinodes.append((new_antenna_x, new_antenna_y))
+            new_antenna_x = new_antenna_x + gap_x
+            new_antenna_y = new_antenna_y + gap_y
 
-    # Only keep unique antinodes
-    return set(valid_antinodes)
+        return antinodes
+
+    def compute_all_antinodes(
+        self, antennas: list[Antenna], map_size: tuple[int, int]
+    ) -> list[Position]:
+        positions: list[Position] = []
+
+        for i in range(len(antennas) - 1):
+            for j in range(i + 1, len(antennas)):
+                antenna1, antenna2 = antennas[i], antennas[j]
+                if antenna1 != antenna2:
+                    positions += self.compute_antinodes(antenna1, antenna2, map_size)
+
+        return positions
+
+    def compute(self, antenna_map: AntennaMap) -> set[Position]:
+        antennas = antenna_map.list_antennas()
+        antinodes = self.compute_all_antinodes(antennas, antenna_map.grid.shape)
+        # Only keep unique antinodes
+        return set(antinodes)
 
 
 if __name__ == "__main__":
@@ -84,5 +145,10 @@ if __name__ == "__main__":
     terrain = AntennaMap(grid)
     print(terrain)
 
-    result1 = solution1(terrain)
+    solution1 = Solution1()
+    result1 = solution1.compute(terrain)
     print(f"Result1: {len(result1)}")
+
+    solution2 = Solution2()
+    result2 = solution2.compute(terrain)
+    print(f"Result2: {len(result2)}")
