@@ -5,7 +5,7 @@ from aoc2024.day4 import read_file_to_list
 SPACE = "."
 
 
-class DiskMap:
+class Disk:
     def __init__(self, state: str):
         self.state = state
         self.processed = [int(x) for x in state]
@@ -37,16 +37,17 @@ class DiskMap:
         return code
 
 
-def checksum(numbers: list[int]) -> int:
+def checksum(numbers: list[str]) -> int:
     s = 0
     for i, n in enumerate(numbers):
-        s += i * n
+        if n != SPACE:
+            s += i * int(n)
     return s
 
 
 if __name__ == "__main__":
     data = read_file_to_list(Path("inputs/day9.txt"))[0]
-    diskmap = DiskMap(data)
-    code_compacted: list[int] = [int(x) for x in diskmap.compact() if x != SPACE]
+    disk = Disk(data)
+    code_compacted = disk.compact()
     result1 = checksum(code_compacted)
     print(f"Result1: {result1}")
