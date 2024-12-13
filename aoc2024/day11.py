@@ -1,34 +1,56 @@
+from functools import cache
 from pathlib import Path
 
 from aoc2024.day1 import open_txt_file, slice_data
 
 
-def blink_n_times(stones: list[int], n: int) -> list[int]:
-    for _ in range(n):
-        stones = blink_one_time(stones)
+@cache
+def update(stone: int) -> tuple[int, int | None]:
+    if stone == 0:
+        return 1, None
+    elif len(str(stone)) % 2 == 0:
+        string_stone = str(stone)
+        first_half = int(string_stone[len(string_stone) // 2 :])
+        second_half = int(string_stone[: len(string_stone) // 2])
+        return first_half, second_half
+    else:
+        return stone * 2024, None
 
-    return stones
+
+def blink_n_times(freq_dict: dict[int, int], n: int) -> dict[int, int]:
+    for i in range(n):
+        freq_dict = blink_one_time(freq_dict)
+        print(f"Episode {i}: {compute_result(freq_dict)}")
+    return freq_dict
 
 
-def blink_one_time(stones: list[int]) -> list[int]:
-    updated_stones: list[int] = []
+def blink_one_time(freq_dict: dict[int, int]) -> dict[int, int]:
+    updated_freq_dict: dict[int, int] = {}
 
+    for stone in freq_dict.keys():
+        first, second = update(stone)
+        updated_freq_dict[first] = updated_freq_dict.get(first, 0) + freq_dict[stone]
+        if second:
+            updated_freq_dict[second] = (
+                updated_freq_dict.get(second, 0) + freq_dict[stone]
+            )
+
+    return updated_freq_dict
+
+
+def build_dict(stones: list[int]) -> dict[int, int]:
+    freq_dict: dict[int, int] = {}
     for stone in stones:
-        if stone == 0:
-            updated_stones.append(1)
-        elif len(str(stone)) % 2 == 0:
-            string_stone = str(stone)
-            first_half = int(string_stone[len(string_stone) // 2 :])
-            second_half = int(string_stone[: len(string_stone) // 2])
-            updated_stones.append(second_half)
-            updated_stones.append(first_half)
-        else:
-            updated_stones.append(stone * 2024)
+        freq_dict[stone] = freq_dict.get(stone, 0) + 1
+    return freq_dict
 
-    return updated_stones
+
+def compute_result(freq_dict: dict[int, int]) -> int:
+    return sum(freq_dict.values())
 
 
 if __name__ == "__main__":
     inputs = open_txt_file(Path("inputs/day11.txt"))
-    data = slice_data(inputs)[0]
-    print(len(blink_n_times(data, 25)))
+    stones = slice_data(inputs)[0]
+    freq_dict = build_dict(stones)
+    freq_dict = blink_n_times(freq_dict, 75)
