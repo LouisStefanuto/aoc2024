@@ -28,7 +28,18 @@ class MountainWorld:
             for j in range(self.M):
                 if self.grid[i, j] == Config.START:
                     ends = self.get_ends_from(i, j, [])
-                    result += len(set(ends))
+                    result += len(set(ends))  # Unique
+
+        return result
+
+    def solve2(self) -> int:
+        result = 0
+
+        for i in range(self.N):
+            for j in range(self.M):
+                if self.grid[i, j] == Config.START:
+                    ends = self.get_ends_from(i, j, [])
+                    result += len(ends)  # No unique
 
         return result
 
@@ -58,5 +69,5 @@ if __name__ == "__main__":
     grid = grid.astype(int)
     world = MountainWorld(grid)
 
-    result1 = world.solve()
-    print(f"Result1: {result1}")
+    print(f"Result1: {world.solve()}")
+    print(f"Result2: {world.solve2()}")
