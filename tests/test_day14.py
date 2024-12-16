@@ -1,6 +1,6 @@
 import pytest
 
-from aoc2024.day14 import parse_robot, solution1
+from aoc2024.day14 import Robot, display_robots, parse_robot, solution1
 
 
 def test_parse_robot():
@@ -25,6 +25,12 @@ def test_solution1():
     ]
 
     assert solution1(lines, 100, 11, 7) == 12
+
+
+def test_display_robots():
+    robots = [Robot(0, 0, 0, 0, 3, 3)]
+    expected = "#..\n...\n...\n"
+    assert display_robots(robots, 3, 3) == expected
 
 
 if __name__ == "__main__":

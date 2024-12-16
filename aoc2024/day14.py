@@ -2,6 +2,8 @@ import math
 from dataclasses import dataclass
 from pathlib import Path
 
+import numpy as np
+
 from aoc2024.day4 import read_file_to_list
 
 
@@ -53,10 +55,34 @@ def solution1(
         for robot in robots:
             robot.update()
 
+        s = display_robots(robots)
+
+        if "#######" in s:  # Detect tree
+            print(i)
+            print(s)
+
     quadrants = count_robots(robots, max_x, max_y)
     return math.prod(quadrants)
 
 
+def display_robots(robots: list[Robot], max_x: int = 103, max_y: int = 101) -> str:
+    terrain = np.zeros((max_x, max_y), dtype=int)
+    for robot in robots:
+        terrain[robot.px, robot.py] += 1
+
+    # Convert the terrain matrix to a readable string
+    display = ""
+    for y in range(max_y):  # Iterate over rows (Y-axis)
+        for x in range(max_x):  # Iterate over columns (X-axis)
+            if terrain[x, y] == 0:
+                display += "."  # Empty cell
+            else:
+                display += "#"  # Occupied by at least one robot
+        display += "\n"  # Newline after each row
+
+    return display
+
+
 if __name__ == "__main__":
     lines = read_file_to_list(Path("inputs/day14.txt"))
-    print(f"Result1: {solution1(lines, 100, 103, 101)}")
+    print(f"Result1: {solution1(lines, 100000, 103, 101)}")
