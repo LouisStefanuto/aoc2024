@@ -6,7 +6,6 @@ from aoc2024.day13 import (
     Machine,
     Prize,
     build_machines,
-    compute_cost,
     solution1,
 )
 
@@ -47,11 +46,14 @@ def test_build_machines():
 
 
 def test_compute_cost():
-    assert compute_cost([1.0, 1.0]) == 4
-    assert compute_cost([1.0, 4.0]) == 7
-    assert compute_cost([-1.0, 1.0]) == 0
-    assert compute_cost([101.0, 1.0]) == 0
-    assert compute_cost([1.5, 1.0]) == 0
+    machine = Machine(Button(1, 1, 3), Button(2, 2, 1), Prize(3, 3))
+    assert machine.compute_cost([1.0, 1.0]) == 4
+    assert machine.compute_cost([1.0, 4.0]) == 0
+
+    machine = Machine(Button(10, 10, 3), Button(3, 3, 1), Prize(10, 10))
+    assert machine.compute_cost([1.0, 0.0]) == 3
+    assert machine.compute_cost([1.0, 4.0]) == 0
+    assert machine.compute_cost([101.0, 0.0]) == 0
 
 
 def test_solution1():

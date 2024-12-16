@@ -75,6 +75,20 @@ class Machine:
     def solve(self) -> np.ndarray:
         return np.linalg.inv(self.M) @ self.y
 
+    def compute_cost(self, answer: np.ndarray) -> int:
+        x, y = answer
+
+        if x < 0 or y < 0 or x >= 100 or y >= 100:
+            return 0
+
+        X = np.array([round(x), round(y)])
+        px_approx, py_approx = self.M @ X
+
+        if px_approx == self.y[0] and py_approx == self.y[1]:
+            return x * 3 + y
+
+        return 0
+
 
 def build_machines(lines: list[str]) -> list[Machine]:
     machines = []
@@ -88,25 +102,11 @@ def build_machines(lines: list[str]) -> list[Machine]:
     return machines
 
 
-def compute_cost(answer: np.ndarray) -> int:
-    # Convert a NumPy float array to integers, raising an error if any value has a decimal part.
-    rounded = np.round(answer)  # Round to the nearest integer
-    if not np.allclose(answer, rounded, atol=1e-5):
-        return 0
-    answer = rounded.astype(int)
-
-    a, b = answer
-    if a < 0 or b < 0 or a >= 100 or b >= 100:
-        return 0
-
-    return 3 * a + b
-
-
 def solution1(machines: list[Machine]) -> int:
     total_cost = 0
     for machine in machines:
         solution = machine.solve()
-        cost = compute_cost(solution)
+        cost = machine.compute_cost(solution)
         total_cost += cost
         print(f"Solution: {solution} | Cost: {cost}")
     return total_cost
