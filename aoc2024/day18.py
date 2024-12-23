@@ -1,5 +1,6 @@
 from collections import deque
 from pathlib import Path
+from typing import Optional
 
 import numpy as np
 
@@ -40,6 +41,7 @@ class Maze:
                 continue
 
             visited.add((x, y))
+            self.grid[x, y] = "O"
             for dx, dy in self.directions:
                 new_x, new_y = x + dx, y + dy
                 if (
@@ -56,10 +58,22 @@ class Maze:
         return "\n".join(lines)
 
 
+def solve(data: list[Position], size: int) -> Optional[Position]:
+    for n in range(len(data)):
+        matrix = build_matrix(size, data[:n])
+        maze = Maze(matrix)
+        result = maze.bfs()
+        print("Maze:", maze)
+
+        if result == -1:
+            print("Step:", n)
+            print("Blocker is at:", data[n - 1])
+            return data[n - 1]
+
+    return None
+
+
 if __name__ == "__main__":
     lines = read_file_to_list(Path("inputs/day18.txt"))
-    data = [split_line(line) for line in lines][:1024]
-    matrix = build_matrix(71, data)
-    maze = Maze(matrix)
-    print("Result1:", maze.bfs())
-    print(maze)
+    data = [split_line(line) for line in lines]
+    solve(data, 71)
